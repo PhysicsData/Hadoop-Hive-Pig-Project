@@ -1,0 +1,83 @@
+Q1
+select to_date(ts), hour(ts) ,COUNT(*) as cnt
+from twitter.full_text_ts
+where to_date(ts) = '2010-03-06' 
+group by to_date(ts), hour(ts)
+order by cnt desc;
+
+2010-03-06      1       3913
+2010-03-06      2       3888
+2010-03-06      0       3876
+2010-03-06      3       3846
+2010-03-06      4       3776
+2010-03-06      17      3759
+2010-03-06      19      3675
+2010-03-06      18      3655
+2010-03-06      20      3408
+2010-03-06      21      3375
+2010-03-06      23      3348
+2010-03-06      5       3316
+2010-03-06      22      3286
+2010-03-06      16      3215
+2010-03-06      6       2747
+2010-03-06      15      2609
+2010-03-06      7       2225
+2010-03-06      14      1834
+2010-03-06      8       1570
+2010-03-06      9       1146
+2010-03-06      13      938
+2010-03-06      10      611
+2010-03-06      12      426
+2010-03-06      11      409
+
+Q2
+select id,  count( distinct lat_lon) as cnt
+from twitter.full_text
+group by id
+order by cnt desc
+limit 10;
+USER_cd52d26d   134
+USER_13e163cc   119
+USER_c1fe6872   116
+USER_e33d7d87   88
+USER_f44d3703   81
+USER_abcb619a   69
+USER_2dd98cd3   69
+USER_5f96d0b0   67
+USER_6d3f5ee3   67
+USER_d4975d9a   67
+
+Q3
+create table full_test_test_2 as
+select    regexp_extract(lower(tweet), '(.*)#(\\w+)(.*)',2) as tweet_hash
+from twitter.full_text_ts;
+select tweet_hash, COUNT(*) as cnt
+from twitter.full_test_test2
+where tweet_hash is not null and tweet_hash != ''
+group by tweet_hash
+order by cnt desc
+limit 3;
+
+#fail   252
+#thatisall      248
+#random 244
+
+Q4
+create table full_test_ass2 as
+select  regexp_extract(lower(tweet), '(.*)@user_(\\S{8})([:| ])(.*)',2) as tweet_freq
+from twitter.full_text_ts;
+select tweet_freq, COUNT(*) as cnt
+from twitter.full_test_ass2
+group by tweet_freq
+order by cnt desc
+limit 10;
+
+5aac9e88        745
+21fe2e90        332
+559b1bbb        208
+0e9a8962        199
+6163949a        192
+a400b1fb        132
+fd73bdf9        130
+a8349405        115
+c1878ee1        110
