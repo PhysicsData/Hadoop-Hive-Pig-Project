@@ -1,0 +1,79 @@
+Q1
+a = load '/user/lab/pig/full_text.txt' AS (id:chararray, ts:chararray, location:chararray, lat:float, lon:float, tweet:chararray);
+b = filter  a by (SUBSTRING(ts, 0, 10) == '2010-03-06') ;
+c =  foreach b generate id, ts, SUBSTRING(ts, 0, 10) as date, GetHour(ToDate(ts)) as hour_tweet ;
+d = group c by (date, hour_tweet);
+e = foreach d generate group as hour_tweet, COUNT(c) as cnt;
+f = order e by cnt desc;
+dump f;
+
+((2010-03-06,1),3913)
+((2010-03-06,2),3888)
+((2010-03-06,0),3876)
+((2010-03-06,3),3846)
+((2010-03-06,4),3776)
+((2010-03-06,17),3759)
+((2010-03-06,19),3675)
+((2010-03-06,18),3655)
+((2010-03-06,20),3408)
+((2010-03-06,21),3375)
+((2010-03-06,23),3348)
+((2010-03-06,5),3316)
+((2010-03-06,22),3286)
+((2010-03-06,16),3215)
+((2010-03-06,6),2747)
+((2010-03-06,15),2609)
+((2010-03-06,7),2225)
+((2010-03-06,14),1834)
+((2010-03-06,8),1570)
+((2010-03-06,9),1146)
+((2010-03-06,13),938)
+((2010-03-06,10),611)
+((2010-03-06,12),426)
+((2010-03-06,11),409)
+
+
+Q2
+a = load '/user/lab/pig/full_text.txt' AS (id:chararray, ts:chararray, location:chararray, lat:float, lon:float, tweet:chararray);
+b =  foreach a generate  id, location;
+c =  DISTINCT b;
+d = group c by id;
+e = foreach d generate group as id, COUNT(c) as cnt;
+f = order e by cnt DESC;
+h = limit f 10;
+dump h;
+
+(USER_cd52d26d,134)
+(USER_13e163cc,119)
+(USER_c1fe6872,116)
+(USER_e33d7d87,88)
+(USER_f44d3703,81)
+(USER_2dd98cd3,69)
+(USER_abcb619a,69)
+(USER_6d3f5ee3,67)
+(USER_d4975d9a,67)
+(USER_5f96d0b0,67)
+
+
+Q3
+a = load '/user/lab/pig/full_text.txt' AS (id:chararray, ts:chararray, location:chararray, lat:float, lon:float, tweet:chararray);
+b = foreach a generate id, ts, location, LOWER(tweet) as tweet;
+c = foreach b generate   REGEX_EXTRACT((tweet), '(.*)#(\\w+)(.*)',2) as tweet_hash;
+d = filter c by (tweet_hash != '');
+e = group d by tweet_hash;
+f = foreach e generate group as tweet_hash, COUNT(d) as cnt;
+g = order f  by cnt desc;
+h = limit g 3;
+dump h;
+
+
+(ff,5446)
+(nowplaying,2910)
+(inhighschool,2466)
+
+
+
+
+
+
+
