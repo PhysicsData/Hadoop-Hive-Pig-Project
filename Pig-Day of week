@@ -1,0 +1,54 @@
+Q1
+a = load '/apps/hive/warehouse/dayofweek.txt' AS (data:chararray, day_of_week:chararray );
+b = group a ALL;
+c = foreach b generate COUNT(a);
+dump c;
+ 
+Answer
+process : 1
+(9)
+........................................................................................................................................................................
+Q1
+a = load '/apps/hive/warehouse/full_text.txt' AS (id:chararray, ts:chararray, location:chararray, lat:float, lon:float, tweet:chararray);
+b =  foreach a generate  id;
+c =  DISTINCT b;
+d = group c All;
+e = foreach d generate  COUNT(c) as cnt;
+dump e;
+Answer
+process : 1
+(9475)
+........................................................................................................................................................................
+Q3
+a = load '/apps/hive/warehouse/full_text.txt' AS (id:chararray, ts:chararray, location:chararray, lat:float, lon:float, tweet:chararray);
+b = foreach a generate  id,lat,lon;
+c = group b by id;
+d = foreach c generate group as id, AVG(b.lat), AVG(b.lon);
+ e = limit d 5;
+dump e;
+Answer
+(USER_00024ea8,33.919875264167786,-84.44523561000824)
+(USER_001152b0,28.5570556640625,-81.70987701416016)
+(USER_001757c2,38.21270936908144,-85.2263516512784)
+(USER_001ac628,33.95896911621094,-118.30278015136719)
+(USER_002ac912,40.702701568603516,-73.74470520019531)
+-----------------------------------------------------------------------------------------------------------------------------------------
+Q4
+ 
+a = load '/apps/hive/warehouse/full_text.txt' AS (id:chararray, ts:chararray, location:chararray, lat:float, lon:float, tweet:chararray);
+a1 = foreach a generate id, ts, SUBSTRING(ts,0,4) as year1, SUBSTRING(ts,6,7) as month1, SUBSTRING(ts,9,10) as day1
+b = load '/apps/hive/warehouse/dayofweek.txt' AS (data:chararray, day_of_week:chararray );
+b1 = foreach b generate data,day_of_week, SUBSTRING(data,0,1) as day2, SUBSTRING(data,2,3) as month2, SUBSTRING(data,4,8) as year2;
+c = JOIN a1 BY (day1, month1, year1), b1 BY (day2, month2, year2);
+d = foreach c generate a1::id, a1::day1, a1::month1, a1::year1, b1::day_of_week as day_of_week;
+e = group d  by day_of_week;
+h = foreach e generate group as day_of_week, COUNT(d) as cnt;
+g = limit h 5;
+dump g;
+ 
+Answer
+(Friday,82195)
+(Sunday,65166)
+(Tuesday,5189)
+(Saturday,64851)
+(Thursday,83004)
